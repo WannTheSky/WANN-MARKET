@@ -1,0 +1,2530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WANN MARKET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #059669;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --card-bg: #ffffff;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-hover: 0 4px 8px rgba(0,0,0,0.15);
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-light: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg-light);
+            color: var(--dark);
+            line-height: 1.5;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            padding: 0 16px;
+        }
+
+        /* Header Mobile */
+        header {
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coin-balance {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .hamburger-menu span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: var(--dark);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .hamburger-menu.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            padding: 16px;
+            gap: 12px;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .mobile-menu-item:hover {
+            background: var(--bg-light);
+        }
+
+        .mobile-menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Navigation Mobile */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.7rem;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Hero Mobile */
+        .hero {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 16px 0;
+            border-radius: 12px;
+        }
+
+        .hero h1 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        /* Products Mobile */
+        .products-section {
+            padding: 40px 0 80px 0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .product-image {
+            height: 120px;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .product-price {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-stock {
+            color: var(--gray);
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            padding: 40px 0 80px 0;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .profile-info h2 {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .profile-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: var(--bg-light);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Modals Mobile */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-hover);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .admin-tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .admin-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.active {
+            display: block;
+        }
+
+        /* Payment Methods */
+        .payment-method {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .payment-method h4 {
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .payment-method .number {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .status-banned {
+            background: #fecaca;
+            color: #b91c1c;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-4 {
+            margin-top: 16px;
+        }
+
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .text-sm {
+            font-size: 0.8rem;
+        }
+
+        .text-gray {
+            color: var(--gray);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .gap-2 {
+            gap: 8px;
+        }
+
+        /* Ban Screen */
+        .ban-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .ban-screen.hidden {
+            display: none;
+        }
+
+        .ban-screen i {
+            font-size: 4rem;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .ban-screen h1 {
+            font-size: 2rem;
+            color: var(--danger);
+            margin-bottom: 12px;
+        }
+
+        .ban-screen p {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+            max-width: 500px;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
+                margin: 0 auto;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .hamburger-menu {
+                display: flex;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 980px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        /* Coin Packages */
+        .coin-package {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .coin-package:hover {
+            border-color: var(--primary);
+        }
+
+        .coin-package input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .coin-package label {
+            flex: 1;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ban Screen -->
+    <div class="ban-screen hidden" id="banScreen">
+        <i class="fas fa-ban"></i>
+        <h1>AKUN ANDA TELAH DI-BAN</h1>
+        <p>Anda tidak dapat mengakses website ini karena akun Anda telah di-ban oleh administrator.</p>
+        <p>Jika Anda merasa ini adalah kesalahan, silakan hubungi administrator.</p>
+        <button class="btn btn-primary mt-4" onclick="logoutAndRedirect()">
+            <i class="fas fa-sign-out-alt"></i> Keluar
+        </button>
+    </div>
+
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-gem"></i>
+                    <span>WANN MARKET</span>
+                </div>
+                <div class="user-actions">
+                    <div class="coin-balance">
+                        <i class="fas fa-coins"></i>
+                        <span id="userCoins">0</span>
+                    </div>
+                    <button class="btn btn-primary hidden" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Masuk
+                    </button>
+                    <button class="btn btn-secondary hidden" id="adminBtn">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="btn btn-danger hidden" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                    <div class="hamburger-menu" id="hamburgerMenu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#" class="mobile-menu-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="#" class="mobile-menu-item" data-page="products">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Produk</span>
+            </a>
+            <a href="#" class="mobile-menu-item" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Profil Saya</span>
+            </a>
+            <a href="#" class="mobile-menu-item" data-page="coins">
+                <i class="fas fa-coins"></i>
+                <span>Topup Koin</span>
+            </a>
+            <a href="#" class="mobile-menu-item hidden" id="adminMobileNav" data-page="admin">
+                <i class="fas fa-cog"></i>
+                <span>Admin Panel</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Marketplace Premium</h1>
+            <p>Belanja dengan koin, dapatkan produk eksklusif</p>
+            <button class="btn btn-secondary" id="exploreBtn">
+                <i class="fas fa-shopping-bag"></i> Jelajahi
+            </button>
+        </section>
+
+        <section class="products-section">
+            <h2 class="section-title">Produk Unggulan</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded here -->
+            </div>
+        </section>
+
+        <section id="profileSection" class="profile-section hidden">
+            <h2 class="section-title">Profil Saya</h2>
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profileName">Nama Pengguna</h2>
+                        <p id="profileEmail">email@example.com</p>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="profileCoins">0</div>
+                        <div class="stat-label">Total Koin</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="profileOrders">0</div>
+                        <div class="stat-label">Total Pesanan</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" id="changePasswordBtn">
+                    <i class="fas fa-key"></i> Ubah Kata Sandi
+                </button>
+                <button class="btn btn-secondary" style="width: 100%;" id="topupProfileBtn">
+                    <i class="fas fa-coins"></i> Topup Koin
+                </button>
+            </div>
+            
+            <h3 class="section-title">Riwayat Pesanan</h3>
+            <div id="orderHistory">
+                <!-- Order history will be loaded here -->
+            </div>
+        </section>
+
+        <section id="adminPanel" class="hidden">
+            <div class="admin-panel">
+                <h2 class="section-title">Admin Panel</h2>
+                <div class="admin-tabs">
+                    <div class="admin-tab active" data-tab="products">Produk</div>
+                    <div class="admin-tab" data-tab="payments">Pembayaran</div>
+                    <div class="admin-tab" data-tab="orders">Pesanan</div>
+                    <div class="admin-tab" data-tab="topups">Topup Koin</div>
+                    <div class="admin-tab" data-tab="users">User</div>
+                    <div class="admin-tab" data-tab="admins">Admin</div>
+                </div>
+                
+                <div class="admin-content active" id="products-tab">
+                    <button class="btn btn-primary" id="addProductBtn" style="width: 100%; margin-bottom: 16px;">
+                        <i class="fas fa-plus"></i> Tambah Produk
+                    </button>
+                    <div id="adminProductsList">
+                        <!-- Admin products list will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="admin-content" id="payments-tab">
+                    <button class="btn btn-primary" id="addPaymentBtn" style="width: 100%; margin-bottom: 16px;">
+                        <i class="fas fa-plus"></i> Tambah Metode Pembayaran
+                    </button>
+                    <div id="adminPaymentsList">
+                        <!-- Admin payments list will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="admin-content" id="orders-tab">
+                    <div id="adminOrdersList">
+                        <!-- Admin orders list will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="admin-content" id="topups-tab">
+                    <div id="adminTopupsList">
+                        <!-- Admin topups list will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="admin-content" id="users-tab">
+                    <div id="adminUsersList">
+                        <!-- Admin users list will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="admin-content" id="admins-tab">
+                    <button class="btn btn-primary" id="addAdminBtn" style="width: 100%; margin-bottom: 16px;">
+                        <i class="fas fa-plus"></i> Tambah Admin
+                    </button>
+                    <div id="adminAdminsList">
+                        <!-- Admin admins list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-page="home">
+            <i class="fas fa-home"></i>
+            <span>Beranda</span>
+        </a>
+        <a href="#" class="nav-item" data-page="products">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Produk</span>
+        </a>
+        <a href="#" class="nav-item" data-page="profile">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+        <a href="#" class="nav-item" data-page="coins">
+            <i class="fas fa-coins"></i>
+            <span>Koin</span>
+        </a>
+        <a href="#" class="nav-item hidden" id="adminNav" data-page="admin">
+            <i class="fas fa-cog"></i>
+            <span>Admin</span>
+        </a>
+    </nav>
+
+    <!-- Modals -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Masuk</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Masuk</button>
+            </form>
+            <p class="text-center mt-4">
+                Belum punya akun? <a href="#" id="showRegister">Daftar</a>
+            </p>
+            <p class="text-center mt-2">
+                <a href="#" id="showForgotPassword">Lupa kata sandi?</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Daftar</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" class="form-control" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="registerPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Daftar</button>
+            </form>
+            <p class="text-center mt-4">
+                Sudah punya akun? <a href="#" id="showLogin">Masuk</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="forgotPasswordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Reset Kata Sandi</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="forgotPasswordEmail" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Kirim Link Reset</button>
+            </form>
+            <p class="text-center mt-4">
+                <a href="#" id="showLoginFromForgot">Kembali ke halaman masuk</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="changePasswordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Ubah Kata Sandi</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label class="form-label">Kata Sandi Saat Ini</label>
+                    <input type="password" class="form-control" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Kata Sandi Baru</label>
+                    <input type="password" class="form-control" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Konfirmasi Kata Sandi Baru</label>
+                    <input type="password" class="form-control" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Ubah Kata Sandi</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="buyCoinsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Topup Koin</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Pilih Paket</label>
+                <div>
+                    <div class="coin-package" data-coins="100" data-price="10000">
+                        <input type="radio" name="coinPackage" id="package1">
+                        <label for="package1">100 Koin - Rp 10.000</label>
+                    </div>
+                    <div class="coin-package" data-coins="250" data-price="20000">
+                        <input type="radio" name="coinPackage" id="package2">
+                        <label for="package2">250 Koin - Rp 20.000</label>
+                    </div>
+                    <div class="coin-package" data-coins="500" data-price="35000">
+                        <input type="radio" name="coinPackage" id="package3">
+                        <label for="package3">500 Koin - Rp 35.000</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Metode Pembayaran</label>
+                <select class="form-control" id="paymentMethod">
+                    <!-- Payment methods will be loaded here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bukti Transfer (Nomor Referensi)</label>
+                <input type="text" class="form-control" id="paymentProof" placeholder="Contoh: 123456789" required>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" id="requestTopup">Request Topup</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addProductModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="addProductModalTitle">Tambah Produk</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="addProductForm">
+                <input type="hidden" id="editProductId">
+                <div class="form-group">
+                    <label class="form-label">URL Gambar Produk</label>
+                    <input type="url" class="form-control" id="productImageUrl" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nama Produk</label>
+                    <input type="text" class="form-control" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Harga (Koin)</label>
+                    <input type="number" class="form-control" id="productPrice" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stok</label>
+                    <input type="number" class="form-control" id="productStock" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Link Produk</label>
+                    <input type="url" class="form-control" id="productLink" placeholder="https://..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea class="form-control" id="productDescription" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="submitProductBtn">Tambah Produk</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="addPaymentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Tambah Metode Pembayaran</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="addPaymentForm">
+                <div class="form-group">
+                    <label class="form-label">Nama Metode</label>
+                    <input type="text" class="form-control" id="paymentName" placeholder="Contoh: DANA" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nomor/ID</label>
+                    <input type="text" class="form-control" id="paymentNumber" placeholder="Contoh: 088877675656" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Atas Nama</label>
+                    <input type="text" class="form-control" id="paymentHolder" placeholder="Nama pemilik" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Tambah Metode</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="addAdminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Tambah Admin</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="addAdminForm">
+                <div class="form-group">
+                    <label class="form-label">Email User</label>
+                    <input type="email" class="form-control" id="adminEmail" placeholder="email@example.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Tambah Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="productLinkModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Link Produk</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <p id="productLinkText" class="text-center mb-2"></p>
+                <a href="#" id="productLinkUrl" target="_blank" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-external-link-alt"></i> Buka Link Produk
+                </a>
+            </div>
+            <button class="btn btn-secondary mt-4" style="width: 100%;" onclick="hideModal(document.getElementById('productLinkModal'))">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FIREBASE CONFIG ====================
+        const firebaseConfig = {
+            // GANTI DENGAN CONFIG FIREBASE ANDA
+            apiKey: "AIzaSyDbt4RVTt5v43b7t217lEbp4O4p0E7yErU",
+            authDomain: "wann-market-7ad6f.firebaseapp.com",
+            projectId: "wann-market-7ad6f",
+            storageBucket: "wann-market-7ad6f.firebasestorage.app",
+            messagingSenderId: "202052121839",
+            appId: "1:202052121839:web:fe02cb8b1c1a84fb2c571a",
+            measurementId: "G-5K9TZWZN9E"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // DOM Elements
+        const userCoins = document.getElementById('userCoins');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const adminPanel = document.getElementById('adminPanel');
+        const adminNav = document.getElementById('adminNav');
+        const adminMobileNav = document.getElementById('adminMobileNav');
+        const productsGrid = document.getElementById('productsGrid');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const profileSection = document.getElementById('profileSection');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const topupProfileBtn = document.getElementById('topupProfileBtn');
+        const banScreen = document.getElementById('banScreen');
+
+        // Modals
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+        const changePasswordModal = document.getElementById('changePasswordModal');
+        const buyCoinsModal = document.getElementById('buyCoinsModal');
+        const addProductModal = document.getElementById('addProductModal');
+        const addPaymentModal = document.getElementById('addPaymentModal');
+        const addAdminModal = document.getElementById('addAdminModal');
+        const productLinkModal = document.getElementById('productLinkModal');
+
+        // Forms
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        const changePasswordForm = document.getElementById('changePasswordForm');
+        const addProductForm = document.getElementById('addProductForm');
+        const addPaymentForm = document.getElementById('addPaymentForm');
+        const addAdminForm = document.getElementById('addAdminForm');
+
+        // Global Variables
+        let currentUser = null;
+        let isAdmin = false;
+        let ADMIN_UIDS = [];
+
+        // ==================== EVENT LISTENERS ====================
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Auth Buttons
+        loginBtn.addEventListener('click', () => showModal(loginModal));
+        logoutBtn.addEventListener('click', handleLogout);
+        adminBtn.addEventListener('click', () => adminPanel.classList.remove('hidden'));
+
+        // Hamburger Menu
+        hamburgerMenu.addEventListener('click', toggleMobileMenu);
+
+        // Mobile Menu Items
+        document.querySelectorAll('.mobile-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = item.getAttribute('data-page');
+                showPage(page);
+                toggleMobileMenu();
+                
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    if (nav.getAttribute('data-page') === page) {
+                        nav.classList.add('active');
+                    } else {
+                        nav.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // Bottom Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = item.getAttribute('data-page');
+                showPage(page);
+                
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // Modal Buttons
+        exploreBtn.addEventListener('click', () => showPage('products'));
+        document.getElementById('showRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(loginModal);
+            showModal(registerModal);
+        });
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(registerModal);
+            showModal(loginModal);
+        });
+        document.getElementById('showForgotPassword').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(loginModal);
+            showModal(forgotPasswordModal);
+        });
+        document.getElementById('showLoginFromForgot').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(forgotPasswordModal);
+            showModal(loginModal);
+        });
+        changePasswordBtn.addEventListener('click', () => showModal(changePasswordModal));
+        topupProfileBtn.addEventListener('click', () => showModal(buyCoinsModal));
+        document.getElementById('requestTopup').addEventListener('click', handleRequestTopup);
+        document.getElementById('addProductBtn').addEventListener('click', () => showAddProductModal());
+        document.getElementById('addPaymentBtn').addEventListener('click', () => showModal(addPaymentModal));
+        document.getElementById('addAdminBtn').addEventListener('click', () => showModal(addAdminModal));
+
+        // Close Modals
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const modal = btn.closest('.modal');
+                hideModal(modal);
+                resetProductForm();
+            });
+        });
+
+        // Form Submissions
+        loginForm.addEventListener('submit', handleLogin);
+        registerForm.addEventListener('submit', handleRegister);
+        forgotPasswordForm.addEventListener('submit', handleForgotPassword);
+        changePasswordForm.addEventListener('submit', handleChangePassword);
+        addProductForm.addEventListener('submit', handleAddProduct);
+        addPaymentForm.addEventListener('submit', handleAddPayment);
+        addAdminForm.addEventListener('submit', handleAddAdmin);
+
+        // Admin Tabs
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                switchAdminTab(tabId);
+            });
+        });
+
+        // ==================== AUTH FUNCTIONS ====================
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+
+                // Check for ban status
+                const bannedDoc = await db.collection('bannedUsers').doc(currentUser.uid).get();
+                if (bannedDoc.exists) {
+                    await auth.signOut(); // Force logout if banned
+                    showBanScreen();
+                    return;
+                }
+
+                hideModal(loginModal);
+                await checkIfAdmin(currentUser.uid);
+                loadUserData(currentUser.uid);
+            } catch (error) {
+                alert('Login gagal: ' + error.message);
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    
+                    return db.collection('users').doc(currentUser.uid).set({
+                        name: name,
+                        email: email,
+                        coins: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    hideModal(registerModal);
+                    checkIfAdmin(currentUser.uid);
+                    loadUserData(currentUser.uid);
+                })
+                .catch((error) => {
+                    alert('Pendaftaran gagal: ' + error.message);
+                });
+        }
+
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotPasswordEmail').value;
+            
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    alert('Link reset kata sandi telah dikirim ke email Anda!');
+                    hideModal(forgotPasswordModal);
+                    showModal(loginModal);
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+        }
+
+        function handleChangePassword(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('Konfirmasi kata sandi tidak cocok!');
+                return;
+            }
+            
+            // Re-authenticate user
+            const credential = firebase.auth.EmailAuthProvider.credential(
+                currentUser.email, 
+                currentPassword
+            );
+            
+            currentUser.reauthenticateWithCredential(credential)
+                .then(() => {
+                    return currentUser.updatePassword(newPassword);
+                })
+                .then(() => {
+                    alert('Kata sandi berhasil diubah!');
+                    hideModal(changePasswordModal);
+                    changePasswordForm.reset();
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+        }
+
+        function handleLogout() {
+            auth.signOut();
+        }
+
+        async function checkIfAdmin(uid) {
+            // Load admin list from Firestore
+            const adminDoc = await db.collection('adminSettings').doc('admins').get();
+            if (adminDoc.exists) {
+                ADMIN_UIDS = adminDoc.data().uids || [];
+            } else {
+                // If no admin settings exist, create initial admin list
+                // GANTI DENGAN UID ADMIN ANDA
+                const initialAdminUids = ["hPkUiXuhaOWKZz25wnqG4HD25o32"];
+                await db.collection('adminSettings').doc('admins').set({
+                    uids: initialAdminUids,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                ADMIN_UIDS = initialAdminUids;
+            }
+            
+            isAdmin = ADMIN_UIDS.includes(uid);
+            updateUI();
+            
+            if (isAdmin) {
+                loadAdminData();
+                setupAdminListeners();
+            }
+        }
+
+        function loadUserData(uid) {
+            db.collection('users').doc(uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        userCoins.textContent = userData.coins || 0;
+                        
+                        // Update profile data
+                        document.getElementById('profileName').textContent = userData.name;
+                        document.getElementById('profileEmail').textContent = userData.email;
+                        document.getElementById('profileCoins').textContent = userData.coins || 0;
+                        
+                        // Load order history
+                        loadOrderHistory(uid);
+                    }
+                });
+        }
+
+        // ==================== PRODUCT FUNCTIONS ====================
+        function loadProducts() {
+            productsGrid.innerHTML = '<div class="text-center">Memuat produk...</div>';
+            
+            db.collection('products').where('stock', '>', 0).get()
+                .then((querySnapshot) => {
+                    productsGrid.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        productsGrid.innerHTML = '<div class="text-center">Tidak ada produk</div>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const product = doc.data();
+                        const productId = doc.id;
+                        
+                        const productCard = document.createElement('div');
+                        productCard.className = 'product-card';
+                        productCard.innerHTML = `
+                            <div class="product-image">
+                                ${product.imageUrl ? 
+                                    `<img src="${product.imageUrl}" alt="${product.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-box\\'></i>';">` : 
+                                    `<i class="fas ${product.icon || 'fa-box'}"></i>`
+                                }
+                            </div>
+                            <h3 class="product-title">${product.name}</h3>
+                            <div class="product-stock">Stok: ${product.stock || 0}</div>
+                            <div class="product-price">
+                                <i class="fas fa-coins"></i> ${product.price} Koin
+                            </div>
+                            <button class="btn btn-primary buy-product" 
+                                    data-id="${productId}" 
+                                    data-price="${product.price}"
+                                    data-link="${product.link || '#'}"
+                                    style="width: 100%;">
+                                <i class="fas fa-shopping-cart"></i> Beli Sekarang
+                            </button>
+                        `;
+                        
+                        productsGrid.appendChild(productCard);
+                    });
+                    
+                    document.querySelectorAll('.buy-product').forEach(button => {
+                        button.addEventListener('click', handleBuyProduct);
+                    });
+                });
+        }
+
+        function handleBuyProduct(e) {
+            if (!currentUser) {
+                alert('Silakan login terlebih dahulu!');
+                showModal(loginModal);
+                return;
+            }
+            
+            const productId = e.target.closest('.buy-product').getAttribute('data-id');
+            const productPrice = parseInt(e.target.closest('.buy-product').getAttribute('data-price'));
+            const productLink = e.target.closest('.buy-product').getAttribute('data-link');
+            
+            // Check user coins
+            db.collection('users').doc(currentUser.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        const userCoins = userData.coins || 0;
+                        
+                        if (userCoins >= productPrice) {
+                            // Create order
+                            return db.collection('orders').add({
+                                userId: currentUser.uid,
+                                userName: userData.name,
+                                productId: productId,
+                                productName: e.target.closest('.product-card').querySelector('.product-title').textContent,
+                                productLink: productLink,
+                                price: productPrice,
+                                status: 'completed',
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } else {
+                            throw new Error('Koin tidak cukup!');
+                        }
+                    }
+                })
+                .then((orderRef) => {
+                    // Deduct coins and update product stock
+                    return Promise.all([
+                        db.collection('users').doc(currentUser.uid).update({
+                            coins: firebase.firestore.FieldValue.increment(-productPrice)
+                        }),
+                        db.collection('products').doc(productId).update({
+                            stock: firebase.firestore.FieldValue.increment(-1)
+                        }),
+                        orderRef
+                    ]);
+                })
+                .then(([_, __, orderRef]) => {
+                    // Show product link
+                    showProductLink(productLink);
+                    loadUserData(currentUser.uid);
+                    loadProducts();
+                    if (isAdmin) loadAdminProducts();
+                })
+                .catch((error) => {
+                    if (error.message === 'Koin tidak cukup!') {
+                        alert('Koin tidak cukup! Silakan top up terlebih dahulu.');
+                        showModal(buyCoinsModal);
+                    } else {
+                        alert('Error: ' + error.message);
+                    }
+                });
+        }
+
+        function showProductLink(link) {
+            document.getElementById('productLinkText').textContent = 'Berhasil membeli produk!';
+            document.getElementById('productLinkUrl').href = link;
+            document.getElementById('productLinkUrl').textContent = 'Buka Link Produk';
+            showModal(productLinkModal);
+        }
+
+        // ==================== PRODUCT MANAGEMENT ====================
+        function showAddProductModal(product = null) {
+            if (product) {
+                // Edit mode
+                document.getElementById('addProductModalTitle').textContent = 'Edit Produk';
+                document.getElementById('submitProductBtn').textContent = 'Update Produk';
+                document.getElementById('editProductId').value = product.id;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productStock').value = product.stock;
+                document.getElementById('productLink').value = product.link || '';
+                document.getElementById('productDescription').value = product.description || '';
+                document.getElementById('productImageUrl').value = product.imageUrl || '';
+            } else {
+                // Add mode
+                document.getElementById('addProductModalTitle').textContent = 'Tambah Produk';
+                document.getElementById('submitProductBtn').textContent = 'Tambah Produk';
+                resetProductForm();
+            }
+            showModal(addProductModal);
+        }
+
+        function resetProductForm() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('editProductId').value = '';
+        }
+
+        async function handleAddProduct(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('editProductId').value;
+            const name = document.getElementById('productName').value;
+            const price = parseInt(document.getElementById('productPrice').value);
+            const stock = parseInt(document.getElementById('productStock').value);
+            const link = document.getElementById('productLink').value;
+            const description = document.getElementById('productDescription').value;
+            const imageUrl = document.getElementById('productImageUrl').value;
+            
+            const productData = {
+                name: name,
+                price: price,
+                stock: stock,
+                link: link,
+                description: description,
+                imageUrl: imageUrl,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if (productId) {
+                    // Update existing product
+                    await db.collection('products').doc(productId).update(productData);
+                    alert('Produk berhasil diupdate!');
+                } else {
+                    // Add new product
+                    productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('products').add(productData);
+                    alert('Produk berhasil ditambahkan!');
+                }
+
+                hideModal(addProductModal);
+                resetProductForm();
+                loadProducts();
+                loadAdminProducts();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function handleEditProduct(productId) {
+            db.collection('products').doc(productId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const product = doc.data();
+                        product.id = productId;
+                        showAddProductModal(product);
+                    }
+                });
+        }
+
+        function handleRestockProduct(productId) {
+            const newStock = prompt('Masukkan jumlah stok baru:');
+            if (newStock && !isNaN(newStock) && newStock > 0) {
+                db.collection('products').doc(productId).update({
+                    stock: parseInt(newStock)
+                })
+                .then(() => {
+                    alert('Stok berhasil diupdate!');
+                    loadProducts();
+                    loadAdminProducts();
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+            } else if (newStock !== null) {
+                alert('Input tidak valid. Harap masukkan angka positif.');
+            }
+        }
+
+        // ==================== PAYMENT METHODS ====================
+        function handleAddPayment(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('paymentName').value;
+            const number = document.getElementById('paymentNumber').value;
+            const holder = document.getElementById('paymentHolder').value;
+            
+            db.collection('paymentMethods').add({
+                name: name,
+                number: number,
+                holder: holder,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                alert('Metode pembayaran berhasil ditambahkan!');
+                hideModal(addPaymentModal);
+                addPaymentForm.reset();
+                loadPaymentMethods();
+                loadAdminPayments();
+            })
+            .catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        function loadPaymentMethods() {
+            const paymentSelect = document.getElementById('paymentMethod');
+            paymentSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            db.collection('paymentMethods').get()
+                .then((querySnapshot) => {
+                    paymentSelect.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        paymentSelect.innerHTML = '<option value="">Tidak ada metode</option>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const method = doc.data();
+                        const option = document.createElement('option');
+                        option.value = method.name;
+                        option.textContent = `${method.name} - ${method.number} (${method.holder})`;
+                        paymentSelect.appendChild(option);
+                    });
+                });
+        }
+
+        // ==================== TOPUP SYSTEM ====================
+        function handleRequestTopup() {
+            const selectedPackage = document.querySelector('input[name="coinPackage"]:checked');
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const paymentProof = document.getElementById('paymentProof').value;
+            
+            if (!selectedPackage) {
+                alert('Pilih paket koin terlebih dahulu!');
+                return;
+            }
+            
+            if (!paymentProof) {
+                alert('Masukkan bukti pembayaran!');
+                return;
+            }
+            
+            if (!currentUser) {
+                alert('Silakan login terlebih dahulu!');
+                hideModal(buyCoinsModal);
+                showModal(loginModal);
+                return;
+            }
+            
+            const coins = parseInt(selectedPackage.closest('.coin-package').getAttribute('data-coins'));
+            const amount = parseInt(selectedPackage.closest('.coin-package').getAttribute('data-price'));
+            
+            // Create topup request
+            db.collection('topupRequests').add({
+                userId: currentUser.uid,
+                userName: currentUser.email,
+                coins: coins,
+                amount: amount,
+                paymentMethod: paymentMethod,
+                paymentProof: paymentProof,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                alert('Request topup berhasil dikirim! Tunggu konfirmasi admin.');
+                hideModal(buyCoinsModal);
+                document.getElementById('paymentProof').value = '';
+                if (isAdmin) loadAdminTopups();
+            })
+            .catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // ==================== ORDER HISTORY ====================
+        function loadOrderHistory(userId) {
+            const orderHistory = document.getElementById('orderHistory');
+            orderHistory.innerHTML = 'Memuat...';
+            
+            db.collection('orders')
+                .where('userId', '==', userId)
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    orderHistory.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        orderHistory.innerHTML = '<div class="text-center">Belum ada riwayat pesanan</div>';
+                        return;
+                    }
+                    
+                    let orderCount = 0;
+                    
+                    querySnapshot.forEach((doc) => {
+                        const order = doc.data();
+                        orderCount++;
+                        
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'product-card';
+                        orderItem.innerHTML = `
+                            <h3 class="product-title">${order.productName}</h3>
+                            <div class="product-price">${order.price} Koin</div>
+                            <div class="status-badge status-${order.status} mt-2">${order.status}</div>
+                            ${order.productLink ? `
+                                <a href="${order.productLink}" target="_blank" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                                    <i class="fas fa-external-link-alt"></i> Lihat Link
+                                </a>
+                            ` : ''}
+                        `;
+                        
+                        orderHistory.appendChild(orderItem);
+                    });
+                    
+                    document.getElementById('profileOrders').textContent = orderCount;
+                });
+        }
+
+        // ==================== ADMIN FUNCTIONS ====================
+        function setupAdminListeners() {
+            // Real-time listeners for admin
+            db.collection('topupRequests').where('status', '==', 'pending')
+                .onSnapshot(() => {
+                    loadAdminTopups();
+                });
+            
+            db.collection('orders')
+                .onSnapshot(() => {
+                    loadAdminOrders();
+                });
+            
+            db.collection('users')
+                .onSnapshot(() => {
+                    loadAdminUsers();
+                });
+        }
+
+        function loadAdminData() {
+            loadAdminProducts();
+            loadAdminPayments();
+            loadAdminTopups();
+            loadAdminOrders();
+            loadAdminUsers();
+            loadAdminAdmins();
+        }
+
+        function loadAdminProducts() {
+            const adminProductsList = document.getElementById('adminProductsList');
+            adminProductsList.innerHTML = 'Memuat...';
+            
+            db.collection('products').get()
+                .then((querySnapshot) => {
+                    adminProductsList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        adminProductsList.innerHTML = '<div class="text-center">Tidak ada produk</div>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const product = doc.data();
+                        const productId = doc.id;
+                        
+                        const productItem = document.createElement('div');
+                        productItem.className = 'product-card';
+                        productItem.innerHTML = `
+                            <div class="product-image">
+                                ${product.imageUrl ? 
+                                    `<img src="${product.imageUrl}" alt="${product.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-box\\'></i>';">` : 
+                                    `<i class="fas ${product.icon || 'fa-box'}"></i>`
+                                }
+                            </div>
+                            <h3 class="product-title">${product.name}</h3>
+                            <div class="product-price">${product.price} Koin</div>
+                            <div class="product-stock">Stok: ${product.stock || 0}</div>
+                            ${product.link ? `<div class="text-sm text-gray">Link: ${product.link}</div>` : ''}
+                            <div class="flex gap-2" style="margin-top: 8px;">
+                                <button class="btn btn-warning edit-product" data-id="${productId}" style="flex: 1;">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-success restock-product" data-id="${productId}" style="flex: 1;">
+                                    <i class="fas fa-plus"></i> Restock
+                                </button>
+                                <button class="btn btn-danger delete-product" data-id="${productId}" style="flex: 1;">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                        `;
+                        
+                        adminProductsList.appendChild(productItem);
+                    });
+                    
+                    document.querySelectorAll('.edit-product').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const productId = e.target.closest('.edit-product').getAttribute('data-id');
+                            handleEditProduct(productId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.restock-product').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const productId = e.target.closest('.restock-product').getAttribute('data-id');
+                            handleRestockProduct(productId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-product').forEach(button => {
+                        button.addEventListener('click', handleDeleteProduct);
+                    });
+                });
+        }
+
+        function loadAdminPayments() {
+            const adminPaymentsList = document.getElementById('adminPaymentsList');
+            adminPaymentsList.innerHTML = 'Memuat...';
+            
+            db.collection('paymentMethods').get()
+                .then((querySnapshot) => {
+                    adminPaymentsList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        adminPaymentsList.innerHTML = '<div class="text-center">Tidak ada metode pembayaran</div>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const method = doc.data();
+                        const methodId = doc.id;
+                        
+                        const methodItem = document.createElement('div');
+                        methodItem.className = 'payment-method';
+                        methodItem.innerHTML = `
+                            <h4>${method.name}</h4>
+                            <div class="number">${method.number}</div>
+                            <div class="text-sm">Atas Nama: ${method.holder}</div>
+                            <button class="btn btn-danger delete-payment" data-id="${methodId}" style="width: 100%; margin-top: 8px;">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        `;
+                        
+                        adminPaymentsList.appendChild(methodItem);
+                    });
+                    
+                    document.querySelectorAll('.delete-payment').forEach(button => {
+                        button.addEventListener('click', handleDeletePayment);
+                    });
+                });
+        }
+
+        function loadAdminTopups() {
+            const adminTopupsList = document.getElementById('adminTopupsList');
+            adminTopupsList.innerHTML = 'Memuat...';
+            
+            db.collection('topupRequests').orderBy('createdAt', 'desc').get()
+                .then((querySnapshot) => {
+                    adminTopupsList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        adminTopupsList.innerHTML = '<div class="text-center">Tidak ada request topup</div>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const topup = doc.data();
+                        const topupId = doc.id;
+                        
+                        const topupItem = document.createElement('div');
+                        topupItem.className = 'product-card';
+                        topupItem.innerHTML = `
+                            <h3 class="product-title">${topup.userName}</h3>
+                            <div class="product-price">${topup.coins} Koin</div>
+                            <div class="text-sm">Rp ${topup.amount.toLocaleString()}</div>
+                            <div class="text-sm">Metode: ${topup.paymentMethod}</div>
+                            <div class="text-sm">Bukti: ${topup.paymentProof}</div>
+                            <div class="status-badge status-${topup.status} mt-2">${topup.status}</div>
+                            
+                            ${topup.status === 'pending' ? `
+                                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                    <button class="btn btn-success approve-topup" data-id="${topupId}" data-user="${topup.userId}" data-coins="${topup.coins}" style="flex: 1;">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-danger reject-topup" data-id="${topupId}" style="flex: 1;">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            ` : ''}
+                        `;
+                        
+                        adminTopupsList.appendChild(topupItem);
+                    });
+                    
+                    document.querySelectorAll('.approve-topup').forEach(button => {
+                        button.addEventListener('click', handleApproveTopup);
+                    });
+                    
+                    document.querySelectorAll('.reject-topup').forEach(button => {
+                        button.addEventListener('click', handleRejectTopup);
+                    });
+                });
+        }
+
+        function loadAdminOrders() {
+            const adminOrdersList = document.getElementById('adminOrdersList');
+            adminOrdersList.innerHTML = 'Memuat...';
+            
+            db.collection('orders').orderBy('createdAt', 'desc').get()
+                .then((querySnapshot) => {
+                    adminOrdersList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        adminOrdersList.innerHTML = '<div class="text-center">Tidak ada pesanan</div>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const order = doc.data();
+                        
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'product-card';
+                        orderItem.innerHTML = `
+                            <h3 class="product-title">${order.userName}</h3>
+                            <div class="text-sm">Produk: ${order.productName}</div>
+                            <div class="product-price">${order.price} Koin</div>
+                            <div class="status-badge status-${order.status} mt-2">${order.status}</div>
+                            ${order.productLink ? `
+                                <a href="${order.productLink}" target="_blank" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                                    <i class="fas fa-external-link-alt"></i> Lihat Link
+                                </a>
+                            ` : ''}
+                        `;
+                        
+                        adminOrdersList.appendChild(orderItem);
+                    });
+                });
+        }
+
+        async function loadAdminUsers() {
+            const adminUsersList = document.getElementById('adminUsersList');
+            adminUsersList.innerHTML = 'Memuat...';
+
+            const bannedUsersSnapshot = await db.collection('bannedUsers').get();
+            const bannedUids = bannedUsersSnapshot.docs.map(doc => doc.id);
+            
+            db.collection('users').get()
+                .then((querySnapshot) => {
+                    adminUsersList.innerHTML = '';
+                    
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        const userId = doc.id;
+                        const isBanned = bannedUids.includes(userId);
+                        
+                        const userItem = document.createElement('div');
+                        userItem.className = 'product-card';
+                        userItem.innerHTML = `
+                            <h3 class="product-title">${user.name}</h3>
+                            <div class="text-sm">${user.email}</div>
+                            <div class="product-price">${user.coins || 0} Koin</div>
+                            ${isBanned ? 
+                                `<div class="status-badge status-banned mt-2">BANNED</div>` : ''
+                            }
+                            
+                            <button class="btn btn-secondary add-coins" data-id="${userId}" style="width: 100%; margin-top: 8px;">
+                                <i class="fas fa-plus"></i> Tambah 100 Koin
+                            </button>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                ${isBanned ?
+                                    `<button class="btn btn-success unban-user" data-id="${userId}" style="flex: 1;">
+                                        <i class="fas fa-lock-open"></i> Unban
+                                    </button>` :
+                                    `<button class="btn btn-warning ban-user" data-id="${userId}" style="flex: 1;">
+                                        <i class="fas fa-ban"></i> Ban
+                                    </button>`
+                                }
+                                <button class="btn btn-danger delete-user" data-id="${userId}" style="flex: 1;">
+                                    <i class="fas fa-user-times"></i> Hapus User
+                                </button>
+                            </div>
+                        `;
+                        
+                        adminUsersList.appendChild(userItem);
+                    });
+                    
+                    document.querySelectorAll('.add-coins').forEach(button => {
+                        button.addEventListener('click', handleAddCoins);
+                    });
+                    document.querySelectorAll('.ban-user').forEach(button => {
+                        button.addEventListener('click', handleBanUser);
+                    });
+                    document.querySelectorAll('.unban-user').forEach(button => {
+                        button.addEventListener('click', handleUnbanUser);
+                    });
+                    document.querySelectorAll('.delete-user').forEach(button => {
+                        button.addEventListener('click', handleDeleteUser);
+                    });
+                });
+        }
+
+        async function loadAdminAdmins() {
+            const adminAdminsList = document.getElementById('adminAdminsList');
+            adminAdminsList.innerHTML = 'Memuat...';
+            
+            // Load admin list
+            const adminDoc = await db.collection('adminSettings').doc('admins').get();
+            const adminUids = adminDoc.exists ? adminDoc.data().uids : [];
+            
+            // Get user data for each admin
+            const adminPromises = adminUids.map(uid => 
+                db.collection('users').doc(uid).get().then(doc => ({ uid, data: doc.data() }))
+            );
+            
+            Promise.all(adminPromises)
+                .then(adminUsers => {
+                    adminAdminsList.innerHTML = '';
+                    
+                    if (adminUsers.length === 0) {
+                        adminAdminsList.innerHTML = '<div class="text-center">Tidak ada admin</div>';
+                        return;
+                    }
+                    
+                    adminUsers.forEach(({ uid, data }) => {
+                        if (!data) return;
+                        
+                        const adminItem = document.createElement('div');
+                        adminItem.className = 'product-card';
+                        adminItem.innerHTML = `
+                            <h3 class="product-title">${data.name}</h3>
+                            <div class="text-sm">${data.email}</div>
+                            <div class="text-sm">UID: ${uid}</div>
+                            ${uid !== currentUser.uid ? `
+                                <button class="btn btn-danger remove-admin" data-uid="${uid}" style="width: 100%; margin-top: 8px;">
+                                    <i class="fas fa-user-times"></i> Hapus Admin
+                                </button>
+                            ` : `
+                                <div class="status-badge status-approved mt-2">Admin Utama</div>
+                            `}
+                        `;
+                        
+                        adminAdminsList.appendChild(adminItem);
+                    });
+                    
+                    document.querySelectorAll('.remove-admin').forEach(button => {
+                        button.addEventListener('click', handleRemoveAdmin);
+                    });
+                });
+        }
+
+        function handleDeleteProduct(e) {
+            const productId = e.target.closest('.delete-product').getAttribute('data-id');
+            
+            if (confirm('Hapus produk ini?')) {
+                db.collection('products').doc(productId).delete()
+                    .then(() => {
+                        alert('Produk dihapus!');
+                        loadProducts();
+                        loadAdminProducts();
+                    })
+                    .catch((error) => {
+                        alert('Error: ' + error.message);
+                    });
+            }
+        }
+
+        function handleDeletePayment(e) {
+            const paymentId = e.target.closest('.delete-payment').getAttribute('data-id');
+            
+            if (confirm('Hapus metode pembayaran ini?')) {
+                db.collection('paymentMethods').doc(paymentId).delete()
+                    .then(() => {
+                        alert('Metode pembayaran dihapus!');
+                        loadPaymentMethods();
+                        loadAdminPayments();
+                    })
+                    .catch((error) => {
+                        alert('Error: ' + error.message);
+                    });
+            }
+        }
+
+        function handleApproveTopup(e) {
+            const topupId = e.target.closest('.approve-topup').getAttribute('data-id');
+            const userId = e.target.closest('.approve-topup').getAttribute('data-user');
+            const coins = parseInt(e.target.closest('.approve-topup').getAttribute('data-coins'));
+            
+            // Update topup status
+            db.collection('topupRequests').doc(topupId).update({
+                status: 'approved',
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                // Add coins to user
+                return db.collection('users').doc(userId).update({
+                    coins: firebase.firestore.FieldValue.increment(coins)
+                });
+            })
+            .then(() => {
+                alert('Topup approved! Koin telah ditambahkan.');
+                loadAdminTopups();
+                loadAdminUsers(); // Refresh user list just in case
+            })
+            .catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        function handleRejectTopup(e) {
+            const topupId = e.target.closest('.reject-topup').getAttribute('data-id');
+            
+            if (confirm('Tolak request topup ini?')) {
+                db.collection('topupRequests').doc(topupId).update({
+                    status: 'rejected',
+                    rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    alert('Topup rejected!');
+                    loadAdminTopups();
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+            }
+        }
+
+        function handleAddCoins(e) {
+            const userId = e.target.closest('.add-coins').getAttribute('data-id');
+            
+            db.collection('users').doc(userId).update({
+                coins: firebase.firestore.FieldValue.increment(100)
+            })
+            .then(() => {
+                alert('100 koin ditambahkan!');
+                loadAdminUsers();
+                
+                if (currentUser && userId === currentUser.uid) {
+                    loadUserData(currentUser.uid);
+                }
+            })
+            .catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        async function handleBanUser(e) {
+            const userId = e.target.closest('.ban-user').getAttribute('data-id');
+            const userEmail = e.target.closest('.product-card').querySelector('.text-sm').textContent;
+            
+            if (confirm(`Ban user dengan email: ${userEmail} ? Mereka tidak akan bisa login lagi.`)) {
+                try {
+                    // Add UID to bannedUsers collection
+                    await db.collection('bannedUsers').doc(userId).set({
+                        bannedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        bannedBy: currentUser.email // Storing admin info
+                    });
+                    
+                    // Force logout if the banned user is currently logged in
+                    if (currentUser && currentUser.uid === userId) {
+                        await auth.signOut();
+                        showBanScreen();
+                    }
+                    
+                    alert('User berhasil di-ban!');
+                    loadAdminUsers();
+                } catch (error) {
+                    alert('Error saat melakukan ban: ' + error.message);
+                }
+            }
+        }
+
+        async function handleUnbanUser(e) {
+            const userId = e.target.closest('.unban-user').getAttribute('data-id');
+            const userEmail = e.target.closest('.product-card').querySelector('.text-sm').textContent;
+            
+            if (confirm(`Unban user dengan email: ${userEmail} ? Mereka akan bisa login lagi.`)) {
+                try {
+                    // Remove UID from bannedUsers collection
+                    await db.collection('bannedUsers').doc(userId).delete();
+                    
+                    alert('User berhasil di-unban!');
+                    loadAdminUsers();
+                } catch (error) {
+                    alert('Error saat melakukan unban: ' + error.message);
+                }
+            }
+        }
+
+        async function handleDeleteUser(e) {
+            const userId = e.target.closest('.delete-user').getAttribute('data-id');
+            const userEmail = e.target.closest('.product-card').querySelector('.text-sm').textContent;
+
+            if (confirm(`ANDA YAKIN INGIN MENGHAPUS PERMANEN user dengan email: ${userEmail}?\nIni akan menghapus data di Firestore (User, Orders, Topup, Ban status) tetapi TIDAK DAPAT MENGHAPUS AKUN AUTH ASLI DARI SISI CLIENT. Untuk keamanan, akun Auth harus dihapus dari Admin SDK/Backend.`)) {
+                try {
+                    // 1. Delete Firestore User data
+                    await db.collection('users').doc(userId).delete();
+                    
+                    // 2. Delete from bannedUsers if exists
+                    await db.collection('bannedUsers').doc(userId).delete().catch(e => console.log("Ban status not found, skipping."));
+
+                    // 3. Optional: Delete related documents (orders, topup requests)
+                    // This is complex and usually requires batch operations or backend, 
+                    // so we only delete the user doc for now.
+
+                    alert('Data user (Firestore) berhasil dihapus! AKUN AUTH TETAP ADA DAN HARUS DIHAPUS MANUAL DI KONSOLE FIREBASE/BACKEND.');
+                    loadAdminUsers();
+                } catch (error) {
+                    alert('Error saat menghapus user: ' + error.message);
+                }
+            }
+        }
+
+        // ==================== ADMIN MANAGEMENT ====================
+        async function handleAddAdmin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            
+            try {
+                // Find user by email
+                const usersSnapshot = await db.collection('users')
+                    .where('email', '==', email)
+                    .get();
+                
+                if (usersSnapshot.empty) {
+                    alert('User dengan email tersebut tidak ditemukan!');
+                    return;
+                }
+                
+                const userDoc = usersSnapshot.docs[0];
+                const userId = userDoc.id;
+                
+                // Get current admin list
+                const adminDoc = await db.collection('adminSettings').doc('admins').get();
+                let adminUids = [];
+                
+                if (adminDoc.exists) {
+                    adminUids = adminDoc.data().uids || [];
+                }
+                
+                // Check if user is already an admin
+                if (adminUids.includes(userId)) {
+                    alert('User ini sudah menjadi admin!');
+                    return;
+                }
+                
+                // Add user to admin list
+                adminUids.push(userId);
+                
+                await db.collection('adminSettings').doc('admins').set({
+                    uids: adminUids,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert('Admin berhasil ditambahkan!');
+                hideModal(addAdminModal);
+                addAdminForm.reset();
+                loadAdminAdmins();
+                
+                // Update ADMIN_UIDS global variable
+                ADMIN_UIDS = adminUids;
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function handleRemoveAdmin(e) {
+            const uid = e.target.closest('.remove-admin').getAttribute('data-uid');
+            
+            if (confirm('Hapus admin ini?')) {
+                try {
+                    // Get current admin list
+                    const adminDoc = await db.collection('adminSettings').doc('admins').get();
+                    let adminUids = adminDoc.exists ? adminDoc.data().uids : [];
+                    
+                    // Remove user from admin list
+                    adminUids = adminUids.filter(id => id !== uid);
+                    
+                    await db.collection('adminSettings').doc('admins').set({
+                        uids: adminUids,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    alert('Admin berhasil dihapus!');
+                    loadAdminAdmins();
+                    
+                    // Update ADMIN_UIDS global variable
+                    ADMIN_UIDS = adminUids;
+                    
+                    // If the removed admin is the current user, update UI
+                    if (currentUser && currentUser.uid === uid) {
+                        isAdmin = false;
+                        updateUI();
+                    }
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                }
+            }
+        }
+
+        // ==================== BAN SYSTEM ====================
+        function showBanScreen() {
+            // Hide all content and show ban screen
+            document.querySelector('header').classList.add('hidden');
+            document.querySelector('main').classList.add('hidden');
+            document.querySelector('.bottom-nav').classList.add('hidden');
+            banScreen.classList.remove('hidden');
+        }
+
+        function hideBanScreen() {
+            banScreen.classList.add('hidden');
+            document.querySelector('header').classList.remove('hidden');
+            document.querySelector('main').classList.remove('hidden');
+            document.querySelector('.bottom-nav').classList.remove('hidden');
+        }
+
+        function logoutAndRedirect() {
+            auth.signOut().then(() => {
+                window.location.reload();
+            });
+        }
+
+        // ==================== UI FUNCTIONS ====================
+        function updateUI() {
+            if (currentUser) {
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                
+                if (isAdmin) {
+                    adminBtn.classList.remove('hidden');
+                    adminNav.classList.remove('hidden');
+                    adminMobileNav.classList.remove('hidden');
+                } else {
+                    adminBtn.classList.add('hidden');
+                    adminNav.classList.add('hidden');
+                    adminMobileNav.classList.add('hidden');
+                    adminPanel.classList.add('hidden');
+                }
+            } else {
+                loginBtn.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+                adminBtn.classList.add('hidden');
+                adminNav.classList.add('hidden');
+                adminMobileNav.classList.add('hidden');
+                adminPanel.classList.add('hidden');
+            }
+        }
+
+        function showPage(page) {
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Hide all modals when switching page (except the target modal for 'coins')
+            document.querySelectorAll('.modal').forEach(modal => {
+                 if (modal.id !== 'buyCoinsModal') {
+                    hideModal(modal);
+                 }
+            });
+
+            if (page === 'home') {
+                document.querySelector('.hero').classList.remove('hidden');
+                document.querySelector('.products-section').classList.remove('hidden');
+            } else if (page === 'products') {
+                document.querySelector('.products-section').classList.remove('hidden');
+            } else if (page === 'profile') {
+                if (currentUser) {
+                    profileSection.classList.remove('hidden');
+                } else {
+                    alert('Silakan login untuk melihat profil!');
+                    showModal(loginModal);
+                }
+            } else if (page === 'admin' && isAdmin) {
+                adminPanel.classList.remove('hidden');
+            } else if (page === 'coins') {
+                if (currentUser) {
+                    showModal(buyCoinsModal);
+                } else {
+                    alert('Silakan login untuk topup koin!');
+                    showModal(loginModal);
+                }
+            }
+        }
+
+        function toggleMobileMenu() {
+            hamburgerMenu.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        }
+
+        function showModal(modal) {
+            modal.style.display = 'flex';
+        }
+
+        function hideModal(modal) {
+            modal.style.display = 'none';
+        }
+
+        function switchAdminTab(tabId) {
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            document.querySelectorAll('.admin-content').forEach(content => {
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        // ==================== INIT APP ====================
+        function initApp() {
+            auth.onAuthStateChanged(async (user) => {
+                currentUser = user;
+                if (user) {
+                    // Check ban status immediately on auth state change
+                    const bannedDoc = await db.collection('bannedUsers').doc(user.uid).get();
+                    if (bannedDoc.exists) {
+                        showBanScreen();
+                        return;
+                    }
+
+                    await checkIfAdmin(user.uid);
+                    loadUserData(user.uid);
+                    hideBanScreen();
+                } else {
+                    isAdmin = false;
+                    userCoins.textContent = 0;
+                    updateUI();
+                    hideBanScreen();
+                }
+            });
+            
+            loadProducts();
+            loadPaymentMethods();
+            
+            document.querySelectorAll('.coin-package').forEach(package => {
+                package.addEventListener('click', () => {
+                    const radio = package.querySelector('input');
+                    radio.checked = true;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
